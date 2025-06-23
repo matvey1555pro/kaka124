@@ -1,0 +1,129 @@
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService") 
+local player = Players.LocalPlayer
+
+local gui = Instance.new("ScreenGui") 
+gui.Name = "GiveMenu" 
+gui.ResetOnSpawn = false 
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local main = Instance.new("Frame") 
+main.Size = UDim2.new(0, 420, 0, 320) 
+main.Position = UDim2.new(0.5, -210, 0.5, -160)
+main.BackgroundColor3 = Color3.fromRGB(40, 40, 40) 
+main.Parent = gui 
+main.Active = true
+ main.Draggable = true 
+Instance.new("UICorner", main)
+
+local title = Instance.new("TextLabel") 
+title.Size = UDim2.new(1, 0, 0, 40) 
+title.BackgroundColor3 = Color3.fromRGB(60, 60, 60) 
+title.Text = "🎁 Выдача предметов" 
+title.TextColor3 = Color3.new(1,1,1) 
+title.Font = Enum.Font.GothamBold 
+title.TextSize = 20 
+title.Parent = main Instance.new("UICorner", title)
+
+local itemList = { "Raccoon [9.13 KG] [Age 45]", "Red Fox [7.12 KG] [Age 45]", "Dragon Fly [9.72 KG] [Age 45]", "Mimic Octopus [9.92 KG] [Age 45]", "Queen Bee [13.92 KG] [Age 45]", "Moon Cat [5.13 KG] [Age 45]", "Candy Blossym seed", "Moon melon seed", "Chicken zombie [5.10 KG] [Age 48]", "Sunflower seed", "Gradon pepper seed", "night Egg", "Bug Egg", "Sugar apple seed", "Elephant Ears pack", "Suncoli seed", "Moon mango seed", "Moon blossym seed", "Lumira seed", "Master Sprinkler", "Chocolate Sprinkler", "Sweet Soaker Sprinkler", "Reclaimer", "Disco Bee [7.28 KG] [Age 45]", "Night Owl", "Pack Bee [4.99 KG] [Age 45]", "Butterfly [8.19 KG] [Age 45]", "Praying Mantis [8.63 KG] [Age 45]", "Ember Lily seed", "Beanstalk seed", "Cherry Blossym seed", "Cocovine seed", "Honeysuckle", "Nectarine seed", "Eggplant seed", "Moonglow seed", "Blood banana seed", "Durian seed" 
+}
+
+local selected = ""
+
+local searchBox = Instance.new("TextBox") 
+searchBox.PlaceholderText = "🔍 Поиск предмета..."
+searchBox.Size = UDim2.new(0, 380, 0, 30) 
+searchBox.Position = UDim2.new(0, 20, 0, 50) 
+searchBox.BackgroundColor3 = Color3.fromRGB(70, 70, 70) 
+searchBox.TextColor3 = Color3.new(1,1,1) 
+searchBox.Font = Enum.Font.Gotham 
+searchBox.TextSize = 16 
+searchBox.ClearTextOnFocus = false
+searchBox.Text = "" 
+searchBox.Parent = main Instance.new("UICorner", searchBox)
+
+local listFrame = Instance.new("ScrollingFrame") 
+listFrame.Size = UDim2.new(0, 380, 0, 150) 
+listFrame.Position = UDim2.new(0, 20, 0, 90) 
+listFrame.BackgroundColor3 = Color3.fromRGB(30,30,30) 
+listFrame.ScrollBarThickness = 6
+listFrame.CanvasSize = UDim2.new(0,0,0,0) 
+listFrame.Parent = main Instance.new("UICorner", listFrame)
+
+local function updateList() 
+ listFrame:ClearAllChildren()
+ local y = 0
+ for _, item in ipairs(itemList) do
+  if searchBox.Text == "" or string.find(item:lower(), searchBox.Text:lower()) then
+   local btn = Instance.new("TextButton")
+   btn.Size = UDim2.new(1, -10, 0, 28) 
+   btn.Position = UDim2.new(0, 5, 0, y) 
+   btn.Text = item btn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+   btn.TextColor3 = Color3.new(1,1,1)
+   btn.Font = Enum.Font.Gotham
+   btn.TextSize = 14
+   btn.Parent = listFrame
+   Instance.new("UICorner", btn)
+   btn.MouseButton1Click:Connect(function()
+    selected = item
+    searchBox.Text = item
+   end)
+   y += 32
+  end
+ end
+ listFrame.CanvasSize = UDim2.new(0,0,0,y) 
+end
+
+searchBox:GetPropertyChangedSignal("Text"):Connect(updateList)
+updateList()
+
+local button = Instance.new("TextButton") 
+button.Size = UDim2.new(0, 380, 0, 40) 
+button.Position = UDim2.new(0, 20, 1, -50) button.Text = "🎁 Выдать выбранное"
+button.BackgroundColor3 = Color3.fromRGB(50, 120, 60) 
+button.TextColor3 = Color3.new(1,1,1) 
+button.Font = Enum.Font.GothamBold 
+button.TextSize = 18 
+button.Parent = main Instance.new("UICorner", button)
+
+local progressFrame = Instance.new("Frame") 
+progressFrame.Size = UDim2.new(0, 380, 0, 20) 
+progressFrame.Position = UDim2.new(0, 20, 1, -90) 
+progressFrame.BackgroundColor3 = Color3.fromRGB(20,20,20) 
+progressFrame.Parent = main Instance.new("UICorner", progressFrame)
+
+local progressBar = Instance.new("Frame") 
+progressBar.Size = UDim2.new(0, 0, 1, 0) 
+progressBar.BackgroundColor3 = Color3.fromRGB(0, 180, 0) 
+progressBar.Parent = progressFrame Instance.new("UICorner", progressBar) 
+
+local percentText = Instance.new("TextLabel") 
+percentText.Size = UDim2.new(1, 0, 1, 0) 
+percentText.Text = "0%" 
+percentText.BackgroundTransparency = 1 
+percentText.TextColor3 = Color3.new(1, 1, 1) 
+percentText.Font = Enum.Font.GothamBold 
+percentText.TextSize = 14 percentText.Parent = progressFrame
+
+local function startLoading()
+ button.Text = "Загрузка..."
+ button.Active = false
+ for i = 1, 100 do
+  percentText.Text = i .. "%"
+  progressBar.Size = UDim2.new(i/100, 0, 1, 0)
+  wait(1.8)
+ end
+ button.Text = "🔁 Попробуйте ещё раз"
+ percentText.Text = "100%"
+ wait(2)
+ button.Text = "🎁 Выдать выбранное"
+ progressBar.Size = UDim2.new(0, 0, 1, 0)
+ percentText.Text = "0%"
+ button.Active = true 
+end
+
+button.MouseButton1Click:Connect(function() 
+ if selected ~= "" then 
+  startLoading()
+ end 
+end)
