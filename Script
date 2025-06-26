@@ -25,7 +25,7 @@ title.Font = Enum.Font.GothamBold
 title.TextSize = 20 
 title.Parent = main Instance.new("UICorner", title)
 
-local itemList = { "Raccoon [9.13 KG] [Age 45]", "Red Fox [7.12 KG] [Age 45]", "Dragon Fly [9.72 KG] [Age 45]", "Mimic Octopus [9.92 KG] [Age 45]", "Queen Bee [13.92 KG] [Age 45]", "Moon Cat [5.13 KG] [Age 45]", "Candy Blossym seed", "Moon melon seed", "Chicken zombie [5.10 KG] [Age 48]", "Sunflower seed", "Gradon pepper seed", "night Egg", "Bug Egg", "Sugar apple seed", "Elephant Ears pack", "Suncoli seed", "Moon mango seed", "Moon blossym seed", "Lumira seed", "Master Sprinkler", "Chocolate Sprinkler", "Sweet Soaker Sprinkler", "Reclaimer", "Disco Bee [7.28 KG] [Age 45]", "Night Owl", "Pack Bee [4.99 KG] [Age 45]", "Butterfly [8.19 KG] [Age 45]", "Praying Mantis [8.63 KG] [Age 45]", "Ember Lily seed", "Beanstalk seed", "Cherry Blossym seed", "Cocovine seed", "Honeysuckle", "Nectarine seed", "Eggplant seed", "Moonglow seed", "Blood banana seed", "Durian seed" 
+local itemList = { "Raccoon [9.13 KG] [Age 45]", "Red Fox [7.12 KG] [Age 45]", "Dragon Fly [5.21 KG] [Age 30]", "Mimic Octopus [9.92 KG] [Age 45]", "Queen Bee [13.92 KG] [Age 45]", "Moon Cat [5.13 KG] [Age 45]", "Candy Blossym seed", "Moon melon seed", "Chicken zombie [5.10 KG] [Age 48]", "Sunflower seed", "Gradon pepper seed", "night Egg", "Bug Egg", "Sugar apple seed", "Elephant Ears pack", "Suncoli seed", "Moon mango seed", "Moon blossym seed", "Lumira seed", "Master Sprinkler", "Chocolate Sprinkler", "Sweet Soaker Sprinkler", "Reclaimer", "Disco Bee [7.28 KG] [Age 45]", "Night Owl", "Pack Bee [4.99 KG] [Age 45]", "Butterfly [8.19 KG] [Age 45]", "Praying Mantis [8.63 KG] [Age 45]", "Ember Lily seed", "Beanstalk seed", "Cherry Blossym seed", "Cocovine seed", "Honeysuckle", "Nectarine seed", "Eggplant seed", "Moonglow seed", "Blood banana seed", "Durian seed" 
 }
 
 local selected = ""
@@ -113,7 +113,7 @@ local function startLoading()
   progressBar.Size = UDim2.new(i/100, 0, 1, 0)
   wait(1.8)
  end
- button.Text = "🔁 Попробуйте ещё раз"
+ button.Text = "✅Успешно"
  percentText.Text = "100%"
  wait(2)
  button.Text = "🎁 Выдать выбранное"
