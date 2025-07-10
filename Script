@@ -170,7 +170,8 @@ local itemsList = {
     Pets = {"Frog [6.30KG] [16 Age]", "T-Rex [8.10KG] [17 Age]", "Echo Frog [9.10KG] [14 Age]", "Raccoon [14.23KG] [16 Age]"},
     Dupes = {"x1", "x10", "x100", "x1000"},
     Dupe = {},
-    Share = {}
+    Share = {},
+    Special = {"Freeze Moon Cat"} -- Новая вкладка с кнопкой
 }
 
 local allItems = {}
@@ -323,6 +324,38 @@ for tabName, items in pairs(itemsList) do
                 startFakeProcess(resultLabel)
             end
         end)
+    elseif tabName == "Special" then
+        for i, item in ipairs(items) do
+            local itemBtn = Instance.new("TextButton")
+            itemBtn.Size = UDim2.new(1, -40, 0, 44)
+            itemBtn.Position = UDim2.new(0, 20, 0, (i - 1) * 60 + 10)
+            itemBtn.BackgroundColor3 = ButtonColor
+            itemBtn.TextColor3 = TextColor
+            itemBtn.Text = item
+            itemBtn.Font = Enum.Font.GothamMedium
+            itemBtn.TextSize = 14
+            itemBtn.Parent = frame
+
+            local itemCorner = Instance.new("UICorner")
+            itemCorner.CornerRadius = UDim.new(0, 6)
+            itemCorner.Parent = itemBtn
+
+            local statusLabel = Instance.new("TextLabel")
+            statusLabel.Size = UDim2.new(1, -40, 0, 18)
+            statusLabel.Position = UDim2.new(0, 20, 0, (i - 1) * 60 + 54)
+            statusLabel.BackgroundTransparency = 1
+            statusLabel.Text = ""
+            statusLabel.TextColor3 = TextColor
+            statusLabel.Font = Enum.Font.Gotham
+            statusLabel.TextSize = 13
+            statusLabel.TextXAlignment = Enum.TextXAlignment.Left
+            statusLabel.Parent = frame
+
+            itemBtn.MouseButton1Click:Connect(function()
+                playClick()
+                startFakeProcess(statusLabel)
+            end)
+        end
     else
         for i, item in ipairs(items) do
             local itemBtn = Instance.new("TextButton")
