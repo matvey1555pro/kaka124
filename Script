@@ -1,392 +1,138 @@
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
-local SoundService = game:GetService("SoundService")
-local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 
-if game:GetService("CoreGui"):FindFirstChild("DupeGUI") then
-    game:GetService("CoreGui").DupeGUI:Destroy()
-end
-if player:FindFirstChild("PlayerGui"):FindFirstChild("DupeGUI") then
-    player.PlayerGui.DupeGUI:Destroy()
-end
+-- Создание GUI
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+gui.Name = "AnimalDupeUI"
+gui.ResetOnSpawn = false
 
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "DupeGUI"
-screenGui.ResetOnSpawn = false
-screenGui.IgnoreGuiInset = true
-screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-screenGui.Parent = game:GetService("CoreGui")
+local main = Instance.new("Frame", gui)
+main.Size = UDim2.new(0, 400, 0, 400)
+main.Position = UDim2.new(0.5, -200, 0.5, -200)
+main.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+main.BorderSizePixel = 0
+main.BackgroundTransparency = 0.1
+main.AnchorPoint = Vector2.new(0.5, 0.5)
+main.ClipsDescendants = true
+main.Active = true
+main.Draggable = true
+main.Visible = false
+main:TweenSize(UDim2.new(0, 400, 0, 400), "Out", "Quad", 0.5, true)
+main.Visible = true
+main:TweenPosition(UDim2.new(0.5, -200, 0.5, -200), "Out", "Bounce", 0.5, true)
 
-local clickSound = Instance.new("Sound")
-clickSound.SoundId = "rbxassetid://5419098671"
-clickSound.Volume = 0.5
-clickSound.Parent = SoundService
-
-local function playClick()
-    clickSound:Play()
-end
-
-local function startFakeProcess(label)
-    label.Text = "⏳ Загрузка..."
-    label.TextColor3 = Color3.fromRGB(255, 200, 50)
-    task.delay(300, function()
-        label.Text = "❌ Ошибка: повторите попытку."
-        label.TextColor3 = Color3.fromRGB(255, 100, 100)
-    end)
-end
-
-local BaseColor = Color3.fromRGB(15, 15, 15)
-local PanelColor = Color3.fromRGB(30, 30, 30)
-local ButtonColor = Color3.fromRGB(50, 50, 50)
-local TextColor = Color3.fromRGB(255, 255, 255)
-
-local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 580, 0, 380)
-mainFrame.Position = UDim2.new(0.5, -290, 0.5, -190)
-mainFrame.BackgroundColor3 = BaseColor
-mainFrame.BorderSizePixel = 0
-mainFrame.Active = true
-mainFrame.Draggable = true
-mainFrame.Parent = screenGui
-
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 12)
-corner.Parent = mainFrame
-
-local shadow = Instance.new("ImageLabel")
-shadow.BackgroundTransparency = 1
-shadow.Size = UDim2.new(1, 20, 1, 20)
-shadow.Position = UDim2.new(0, -10, 0, -10)
-shadow.Image = "rbxassetid://1316045217"
-shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-shadow.ImageTransparency = 0.6
-shadow.ScaleType = Enum.ScaleType.Slice
-shadow.SliceCenter = Rect.new(10, 10, 118, 118)
-shadow.Parent = mainFrame
-
-local topBar = Instance.new("Frame")
-topBar.Name = "TopBar"
-topBar.Size = UDim2.new(1, 0, 0, 38)
-topBar.BackgroundColor3 = PanelColor
-topBar.BorderSizePixel = 0
-topBar.Parent = mainFrame
-
-local topBarCorner = Instance.new("UICorner")
-topBarCorner.CornerRadius = UDim.new(0, 8)
-topBarCorner.Parent = topBar
-
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, -100, 1, 0)
-title.Position = UDim2.new(0, 12, 0, 0)
+-- Заголовок
+local title = Instance.new("TextLabel", main)
+title.Size = UDim2.new(1, 0, 0, 40)
+title.Text = "Animal Dupe Menu"
+title.TextColor3 = Color3.new(1, 1, 1)
 title.BackgroundTransparency = 1
-title.Text = "mellontyX1"
-title.TextColor3 = TextColor
 title.Font = Enum.Font.GothamBold
-title.TextSize = 16
-title.TextXAlignment = Enum.TextXAlignment.Left
-title.Parent = topBar
+title.TextSize = 20
 
-local function createIconButton(offset, text)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0, 30, 0, 30)
-    btn.Position = UDim2.new(1, offset, 0.5, -15)
-    btn.BackgroundColor3 = ButtonColor
-    btn.Text = text
-    btn.TextColor3 = TextColor
-    btn.Font = Enum.Font.GothamBold
-    btn.TextSize = 14
-    btn.AutoButtonColor = true
-
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(1, 0)
-    corner.Parent = btn
-
-    return btn
-end
-
-local closeBtn = createIconButton(-40, "✕")
-closeBtn.Parent = topBar
-closeBtn.MouseButton1Click:Connect(function()
-    playClick()
-    TweenService:Create(mainFrame, TweenInfo.new(0.3), {Transparency = 1}):Play()
-    wait(0.3)
-    screenGui:Destroy()
-end)
-
-local minimizeBtn = createIconButton(-80, "–")
-minimizeBtn.Parent = topBar
-
-local minimized = false
-local savedState = {}
-
-minimizeBtn.MouseButton1Click:Connect(function()
-    playClick()
-    minimized = not minimized
-    for _, child in ipairs(mainFrame:GetChildren()) do
-        if child ~= topBar and child:IsA("GuiObject") then
-            if minimized then
-                savedState[child] = child.Visible
-                child.Visible = false
-            else
-                if savedState[child] ~= nil then
-                    child.Visible = savedState[child]
-                end
-            end
-        end
-    end
-    local targetSize = minimized and UDim2.new(0, 200, 0, 50) or UDim2.new(0, 580, 0, 380)
-    TweenService:Create(mainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quint), {
-        Size = targetSize
-    }):Play()
-end)
-
-local tabPanel = Instance.new("Frame")
-tabPanel.Position = UDim2.new(0, 0, 0, 38)
-tabPanel.Size = UDim2.new(0, 150, 1, -38)
-tabPanel.BackgroundColor3 = PanelColor
-tabPanel.BorderSizePixel = 0
-tabPanel.Parent = mainFrame
-
-local tabCorner = Instance.new("UICorner")
-tabCorner.CornerRadius = UDim.new(0, 8)
-tabCorner.Parent = tabPanel
-
-local contentFrame = Instance.new("Frame")
-contentFrame.Position = UDim2.new(0, 150, 0, 38)
-contentFrame.Size = UDim2.new(1, -150, 1, -38)
-contentFrame.BackgroundColor3 = BaseColor
-contentFrame.BackgroundTransparency = 0.05
-contentFrame.BorderSizePixel = 0
-contentFrame.Parent = mainFrame
-
-local contentCorner = Instance.new("UICorner")
-contentCorner.CornerRadius = UDim.new(0, 8)
-contentCorner.Parent = contentFrame
-
-local itemsList = {
-    Cosmetics = {"Sign Grate", "Bamboo Wind Chime", "Brown Stone Pillar", "Log"},
-    Fruits = {"Grapes [0.73KG]", "Candy Blossom [1.15KG]", "Beanstalk [0.90KG]", "Mango [1.00KG]"},
-    Pets = {"Frog [6.30KG] [16 Age]", "T-Rex [8.10KG] [17 Age]", "Echo Frog [9.10KG] [14 Age]", "Raccoon [14.23KG] [16 Age]"},
-    Dupes = {"x1", "x10", "x100", "x1000"},
-    Dupe = {},
-    Share = {},
-    Special = {"Freeze Moon Cat"} -- Новая вкладка с кнопкой
+-- Животные
+local animals = {
+    "T-Rex",
+    "Raccon",
+    "Red fox",
+    "Dragonfly",
+    "Mimic Octopus",
+    "Disco bee",
+    "Queen bee",
+    "Fennec Fox",
+    "Butterfly"
 }
 
-local allItems = {}
-for _, list in pairs(itemsList) do
-    for _, item in pairs(list) do
-        table.insert(allItems, item)
-    end
-end
+local selectedAnimal = nil
+local dupeButton
 
-local tabButtons, tabFrames = {}, {}
-local tabIndex = 0
+-- Список
+local listFrame = Instance.new("ScrollingFrame", main)
+listFrame.Size = UDim2.new(1, -20, 1, -80)
+listFrame.Position = UDim2.new(0, 10, 0, 50)
+listFrame.CanvasSize = UDim2.new(0, 0, 0, #animals * 35)
+listFrame.ScrollBarThickness = 6
+listFrame.BackgroundTransparency = 1
 
-for tabName, items in pairs(itemsList) do
-    tabIndex += 1
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1, -20, 0, 36)
-    btn.Position = UDim2.new(0, 10, 0, (tabIndex - 1) * 42 + 10)
-    btn.Text = tabName
-    btn.BackgroundColor3 = ButtonColor
-    btn.TextColor3 = TextColor
-    btn.Font = Enum.Font.GothamBold
-    btn.TextSize = 13
-    btn.AutoButtonColor = true
-    btn.Parent = tabPanel
-
-    local btnCorner = Instance.new("UICorner")
-    btnCorner.CornerRadius = UDim.new(0, 6)
-    btnCorner.Parent = btn
-
-    table.insert(tabButtons, btn)
-
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(1, 0, 1, 0)
-    frame.BackgroundTransparency = 1
-    frame.Visible = tabName == "Fruits"
-    frame.Parent = contentFrame
-
-    tabFrames[tabName] = frame
-
-    btn.MouseButton1Click:Connect(function()
-        for _, f in pairs(tabFrames) do f.Visible = false end
-        for _, b in pairs(tabButtons) do b.BackgroundColor3 = ButtonColor end
-        frame.Visible = true
-        btn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-        playClick()
+for i, name in pairs(animals) do
+    local button = Instance.new("TextButton", listFrame)
+    button.Size = UDim2.new(1, -10, 0, 30)
+    button.Position = UDim2.new(0, 5, 0, (i - 1) * 35)
+    button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    button.TextColor3 = Color3.new(1, 1, 1)
+    button.Font = Enum.Font.Gotham
+    button.TextSize = 16
+    button.Text = name
+    button.AutoButtonColor = true
+    button.BackgroundTransparency = 0.2
+    button.MouseButton1Click:Connect(function()
+        selectedAnimal = name
+        if dupeButton then
+            dupeButton.Visible = true
+        end
     end)
-
-    if tabName == "Dupe" then
-        local info = Instance.new("TextLabel")
-        info.Size = UDim2.new(0, 360, 0, 40)
-        info.Position = UDim2.new(0.5, -180, 0, 10)
-        info.BackgroundTransparency = 1
-        info.TextColor3 = Color3.fromRGB(255, 100, 100)
-        info.Font = Enum.Font.Gotham
-        info.TextSize = 15
-        info.Text = "🔴 Предмет не обнаружен"
-        info.TextXAlignment = Enum.TextXAlignment.Center
-        info.Parent = frame
-
-        local button = Instance.new("TextButton")
-        button.Size = UDim2.new(0, 300, 0, 44)
-        button.Position = UDim2.new(0.5, -150, 0, 60)
-        button.Text = "Добавить в инвентарь"
-        button.BackgroundColor3 = ButtonColor
-        button.TextColor3 = TextColor
-        button.Font = Enum.Font.GothamMedium
-        button.TextSize = 16
-        button.Parent = frame
-
-        local buttonCorner = Instance.new("UICorner")
-        buttonCorner.CornerRadius = UDim.new(0, 6)
-        buttonCorner.Parent = button
-
-        button.MouseButton1Click:Connect(function()
-            playClick()
-            startFakeProcess(info)
-        end)
-
-        RunService.RenderStepped:Connect(function()
-            local tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
-            if tool then
-                info.Text = "🟢 В руке: " .. tool.Name
-                info.TextColor3 = Color3.fromRGB(100, 255, 100)
-            else
-                if not info.Text:find("Загрузка") and not info.Text:find("Ошибка") then
-                    info.Text = "🔴 Предмет не обнаружен"
-                    info.TextColor3 = Color3.fromRGB(255, 100, 100)
-                end
-            end
-        end)
-
-    elseif tabName == "Share" then
-        local box = Instance.new("TextBox")
-        box.PlaceholderText = "🔍 Введите название"
-        box.Size = UDim2.new(0, 300, 0, 44)
-        box.Position = UDim2.new(0.5, -150, 0, 10)
-        box.Font = Enum.Font.Gotham
-        box.TextSize = 16
-        box.BackgroundColor3 = ButtonColor
-        box.TextColor3 = TextColor
-        box.ClearTextOnFocus = false
-        box.Parent = frame
-
-        local boxCorner = Instance.new("UICorner")
-        boxCorner.CornerRadius = UDim.new(0, 6)
-        boxCorner.Parent = box
-
-        local resultLabel = Instance.new("TextLabel")
-        resultLabel.Size = UDim2.new(1, -20, 0, 30)
-        resultLabel.Position = UDim2.new(0.5, -150, 0, 60)
-        resultLabel.BackgroundTransparency = 1
-        resultLabel.TextColor3 = TextColor
-        resultLabel.Font = Enum.Font.Gotham
-        resultLabel.TextSize = 14
-        resultLabel.TextXAlignment = Enum.TextXAlignment.Left
-        resultLabel.Text = ""
-        resultLabel.Parent = frame
-
-        local addBtn = Instance.new("TextButton")
-        addBtn.Size = UDim2.new(0, 300, 0, 44)
-        addBtn.Position = UDim2.new(0.5, -150, 0, 100)
-        addBtn.Text = "Добавить в инвентарь"
-        addBtn.BackgroundColor3 = ButtonColor
-        addBtn.TextColor3 = TextColor
-        addBtn.Font = Enum.Font.GothamMedium
-        addBtn.TextSize = 16
-        addBtn.Parent = frame
-
-        local addBtnCorner = Instance.new("UICorner")
-        addBtnCorner.CornerRadius = UDim.new(0, 6)
-        addBtnCorner.Parent = addBtn
-
-        local currentMatch = nil
-        box:GetPropertyChangedSignal("Text"):Connect(function()
-            local text = box.Text:lower()
-            currentMatch = nil
-            for _, item in ipairs(allItems) do
-                if item:lower():find(text, 1, true) then
-                    resultLabel.Text = "Найдено: " .. item
-                    currentMatch = item
-                    break
-                end
-            end
-            if not currentMatch then resultLabel.Text = "Ничего не найдено" end
-        end)
-
-        addBtn.MouseButton1Click:Connect(function()
-            if currentMatch then
-                playClick()
-                startFakeProcess(resultLabel)
-            end
-        end)
-    elseif tabName == "Special" then
-        for i, item in ipairs(items) do
-            local itemBtn = Instance.new("TextButton")
-            itemBtn.Size = UDim2.new(1, -40, 0, 44)
-            itemBtn.Position = UDim2.new(0, 20, 0, (i - 1) * 60 + 10)
-            itemBtn.BackgroundColor3 = ButtonColor
-            itemBtn.TextColor3 = TextColor
-            itemBtn.Text = item
-            itemBtn.Font = Enum.Font.GothamMedium
-            itemBtn.TextSize = 14
-            itemBtn.Parent = frame
-
-            local itemCorner = Instance.new("UICorner")
-            itemCorner.CornerRadius = UDim.new(0, 6)
-            itemCorner.Parent = itemBtn
-
-            local statusLabel = Instance.new("TextLabel")
-            statusLabel.Size = UDim2.new(1, -40, 0, 18)
-            statusLabel.Position = UDim2.new(0, 20, 0, (i - 1) * 60 + 54)
-            statusLabel.BackgroundTransparency = 1
-            statusLabel.Text = ""
-            statusLabel.TextColor3 = TextColor
-            statusLabel.Font = Enum.Font.Gotham
-            statusLabel.TextSize = 13
-            statusLabel.TextXAlignment = Enum.TextXAlignment.Left
-            statusLabel.Parent = frame
-
-            itemBtn.MouseButton1Click:Connect(function()
-                playClick()
-                startFakeProcess(statusLabel)
-            end)
-        end
-    else
-        for i, item in ipairs(items) do
-            local itemBtn = Instance.new("TextButton")
-            itemBtn.Size = UDim2.new(1, -40, 0, 44)
-            itemBtn.Position = UDim2.new(0, 20, 0, (i - 1) * 60 + 10)
-            itemBtn.BackgroundColor3 = ButtonColor
-            itemBtn.TextColor3 = TextColor
-            itemBtn.Text = item
-            itemBtn.Font = Enum.Font.GothamMedium
-            itemBtn.TextSize = 14
-            itemBtn.Parent = frame
-
-            local itemCorner = Instance.new("UICorner")
-            itemCorner.CornerRadius = UDim.new(0, 6)
-            itemCorner.Parent = itemBtn
-
-            local statusLabel = Instance.new("TextLabel")
-            statusLabel.Size = UDim2.new(1, -40, 0, 18)
-            statusLabel.Position = UDim2.new(0, 20, 0, (i - 1) * 60 + 54)
-            statusLabel.BackgroundTransparency = 1
-            statusLabel.Text = ""
-            statusLabel.TextColor3 = TextColor
-            statusLabel.Font = Enum.Font.Gotham
-            statusLabel.TextSize = 13
-            statusLabel.TextXAlignment = Enum.TextXAlignment.Left
-            statusLabel.Parent = frame
-
-            itemBtn.MouseButton1Click:Connect(function()
-                playClick()
-                startFakeProcess(statusLabel)
-            end)
-        end
-    end
 end
+
+-- Кнопка Dupe
+dupeButton = Instance.new("TextButton", main)
+dupeButton.Size = UDim2.new(1, -20, 0, 40)
+dupeButton.Position = UDim2.new(0, 10, 1, -50)
+dupeButton.BackgroundColor3 = Color3.fromRGB(50, 50, 120)
+dupeButton.TextColor3 = Color3.new(1, 1, 1)
+dupeButton.Font = Enum.Font.GothamBold
+dupeButton.TextSize = 18
+dupeButton.Text = "Dupe"
+dupeButton.Visible = false
+dupeButton.BackgroundTransparency = 0.2
+
+-- Инвентарь (эмуляция)
+local fakeInventory = {
+    ["Disco bee"] = true,
+    ["T-Rex"] = true,
+    ["Butterfly"] = true
+}
+
+-- Уведомление
+local function showNotification(text)
+    local msg = Instance.new("TextLabel", main)
+    msg.Size = UDim2.new(1, -20, 0, 30)
+    msg.Position = UDim2.new(0, 10, 0, 360)
+    msg.BackgroundTransparency = 1
+    msg.TextColor3 = Color3.new(1, 1, 1)
+    msg.Font = Enum.Font.Gotham
+    msg.TextSize = 18
+    msg.Text = text
+    task.wait(4)
+    msg:Destroy()
+end
+
+-- Dupe логика
+dupeButton.MouseButton1Click:Connect(function()
+    if not selectedAnimal then return end
+
+    if not fakeInventory[selectedAnimal] then
+        showNotification("❌ Предмета нету в инвентаре")
+        return
+    end
+
+    local progressBar = Instance.new("Frame", main)
+    progressBar.Size = UDim2.new(0, 0, 0, 10)
+    progressBar.Position = UDim2.new(0, 10, 1, -20)
+    progressBar.BackgroundColor3 = Color3.fromRGB(70, 200, 70)
+    progressBar.BackgroundTransparency = 0.2
+    progressBar.BorderSizePixel = 0
+
+    local duration = 180
+    progressBar.Parent = main
+
+    for i = 0, duration do
+        progressBar.Size = UDim2.new(i / duration, -20, 0, 10)
+        dupeButton.Text = "Dupe (" .. math.floor(i / duration * 100) .. "%)"
+        task.wait(1)
+    end
+
+    progressBar:Destroy()
+    dupeButton.Text = "Dupe"
+    showNotification("⚠️ Попробуйте ещё раз")
+end)
