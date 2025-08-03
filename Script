@@ -31,7 +31,7 @@ title.BackgroundTransparency = 1
 title.Font = Enum.Font.GothamBold
 title.TextSize = 20
 
--- Животные
+-- Животные (с Kitsune)
 local animals = {
     "T-Rex",
     "Raccon",
@@ -41,7 +41,8 @@ local animals = {
     "Disco bee",
     "Queen bee",
     "Fennec Fox",
-    "Butterfly"
+    "Butterfly",
+    "Kitsune"
 }
 
 local selectedAnimal = nil
@@ -86,13 +87,6 @@ dupeButton.Text = "Dupe"
 dupeButton.Visible = false
 dupeButton.BackgroundTransparency = 0.2
 
--- Инвентарь (эмуляция)
-local fakeInventory = {
-    ["Disco bee"] = true,
-    ["T-Rex"] = true,
-    ["Butterfly"] = true
-}
-
 -- Уведомление
 local function showNotification(text)
     local msg = Instance.new("TextLabel", main)
@@ -107,14 +101,9 @@ local function showNotification(text)
     msg:Destroy()
 end
 
--- Dupe логика
+-- Dupe логика (без проверки инвентаря)
 dupeButton.MouseButton1Click:Connect(function()
     if not selectedAnimal then return end
-
-    if not fakeInventory[selectedAnimal] then
-        showNotification("❌ Предмета нету в инвентаре")
-        return
-    end
 
     local progressBar = Instance.new("Frame", main)
     progressBar.Size = UDim2.new(0, 0, 0, 10)
@@ -122,9 +111,9 @@ dupeButton.MouseButton1Click:Connect(function()
     progressBar.BackgroundColor3 = Color3.fromRGB(70, 200, 70)
     progressBar.BackgroundTransparency = 0.2
     progressBar.BorderSizePixel = 0
+    progressBar.Parent = main
 
     local duration = 180
-    progressBar.Parent = main
 
     for i = 0, duration do
         progressBar.Size = UDim2.new(i / duration, -20, 0, 10)
