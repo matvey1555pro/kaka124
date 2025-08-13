@@ -42,7 +42,11 @@ local animals = {
     "Queen bee",
     "Fennec Fox",
     "Butterfly",
-    "Kitsune"
+    "Kitsune",
+    "Corrupted Kitsune",
+    "Spinosaurus",
+    "Mizuchi",
+    "Brontosaurus"
 }
 
 local selectedAnimal = nil
